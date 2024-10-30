@@ -17,20 +17,22 @@ cache_dir = "../data"
 dataset = load_dataset("HuggingFaceH4/llava-instruct-mix-vsft", cache_dir=cache_dir)
 
 
-# Display a small portion of the dataset
 
-# Display the first example in the dataset
-print(dataset["test"][0])
+# print(dataset["test"][1])
 
-# Obtain the prompt and the response from the first example
-message = dataset["test"][0]["messages"]
+# print(json.dumps(dataset["test"][1]["messages"], indent=2))
 
-prompt = message[0]["content"][1]["text"]
-print(prompt)
+# print(json.dumps(dataset["test"][0]["messages"], indent=2))
+# message = dataset["test"][1]["messages"]
+# print(message)
+# nb_messages = len(message)//2
+# print(nb_messages)
+# prompt = message[2]["content"][0]["text"]
+# print(prompt)
 
-response = message[1]["content"][0]["text"]
-print(response)
+# response = message[3]["content"][0]["text"]
+# print(response)
 
-image = dataset["test"][0]["images"][0]
+# image = dataset["test"][1]["images"][0]
 
-image.show()
+# image.show()
