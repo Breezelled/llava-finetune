@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import os
 import json
 import gc
-
+from tqdm import tqdm
 
 print(torch.cuda.is_available())
 print(torch.version.cuda)
@@ -30,16 +30,16 @@ def display_image(image):
 os.makedirs("../model", exist_ok=True)
 
 # Specify the cache directory
-cache_dir = "../model"
+# cache_dir = "../model"
 model_id = "llava-hf/llama3-llava-next-8b-hf"
 
-processor = LlavaNextProcessor.from_pretrained(model_id, cache_dir=cache_dir)
+processor = LlavaNextProcessor.from_pretrained(model_id)
 model = LlavaNextForConditionalGeneration.from_pretrained(
     model_id, 
     torch_dtype=torch.float16, 
     device_map="auto",
     attn_implementation="sdpa",
-    cache_dir=cache_dir
+    # cache_dir=cache_dir
     )
 
 with open(f"../model_config/llama3-llava-next-8b-hf.json", "r") as f:
@@ -90,7 +90,7 @@ total_predictions = 0
 bleu_scores = []
 
 # Evaluate on a subset of the dataset (for example, 100 samples)
-for i, example in enumerate(dataset['test']):  # Change the slice as needed
+for i, example in enumerate(tqdm(dataset['test'], desc="Processing examples")):  # Change the slice as needed
     print(f"Example {i+1}/{len(dataset['test'])}")
     nb_messages = len(example['messages']) // 2
     for j in range(int(nb_messages)):
