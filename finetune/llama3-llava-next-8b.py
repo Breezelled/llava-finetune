@@ -1,7 +1,5 @@
 import torch
-import os
 import json
-import re
 import numpy as np
 
 from datasets import load_dataset
@@ -15,7 +13,9 @@ from transformers import (
 )
 from peft import LoraConfig, prepare_model_for_kbit_training, get_peft_model
 
-from nltk import edit_distance
+from bert_score import score as bert_score
+from nltk.translate.bleu_score import sentence_bleu
+from pycocoevalcap.cider.cider import Cider
 
 
 def main():
@@ -24,7 +24,7 @@ def main():
     dataset_id = "HuggingFaceH4/llava-instruct-mix-vsft"
     output_dir = f"../../model/{model_id.split('/')[1]}/{dataset_id.split('/')[1]}"
     logging_dir = "../../log"
-    train_batch_size = 2
+    train_batch_size = 4
     eval_batch_size = 2
     gradient_accumulation_steps = 1
     num_train_epochs = 1
@@ -94,8 +94,6 @@ def main():
     val_dataset = load_dataset(dataset_id, split="test")
 
     def train_collate_fn(examples):
-        # images = [example["images"] for example in examples]
-        # messages = [example["messages"] for example in examples]
         texts = [processor.apply_chat_template(example["messages"], tokenize=False) for example in examples]
         images = [example["images"] for example in examples]
 
@@ -107,10 +105,9 @@ def main():
             text=texts,
             images=images,
             padding=True,
-            # truncation=True,
+            truncation=True,
             return_tensors="pt",
-            max_length=1024,
-            # size=image_size
+            max_length=2048,
         )
 
 
@@ -124,121 +121,29 @@ def main():
 
         return batch
 
-    # def eval_collate_fn(examples):
-    #     images = [example["images"] for example in examples]
-    #     messages = [example["messages"] for example in examples]
-    #     each_message_images = []
-    #     texts = []
-    #     answers = []
-
-    #     for image, message in zip(images, messages):
-    #         prompts, ground_truths = extract_user_and_ground_truth(message)
-
-    #         for prompt, ground_truth in zip(prompts, ground_truths):
-    #             if not prompt or not ground_truth:
-    #                 continue
-    #             conversation = [
-    #                 {
-    #                     "role": "user",
-    #                     "content": [
-    #                         {"type": "text", "text": prompt},
-    #                         {"type": "image"},
-    #                     ],
-    #                 },
-    #             ]
-    #             text = processor.apply_chat_template(
-    #                 conversation, add_generation_prompt=True
-    #             )
-
-    #             texts.append(text)
-    #             answers.append(ground_truth)
-    #             each_message_images.append(image)
-
-    #     if not texts or not images:
-    #         raise ValueError(
-    #             "The list of text or images is empty. Check the dataset and the extraction function."
-    #         )
-
-    #     batch = processor(
-    #         text=texts,
-    #         images=each_message_images,
-    #         return_tensors="pt",
-    #         padding=True,
-    #         truncation=True,
-    #         max_length=128,
-    #     )
-
-    #     if "input_ids" not in batch:
-    #         raise KeyError(
-    #             "Missing 'input_ids' in processed batch. Check the output of the processor."
-    #         )
-
-    #     assert all(
-    #         value is not None for value in batch.values()
-    #     ), "Batch contains None values"
-
-    #     return {
-    #         "input_ids": batch["input_ids"],
-    #         "attention_mask": batch["attention_mask"],
-    #         "pixel_values": batch["pixel_values"],
-    #         "image_sizes": batch["image_sizes"],
-    #         "answers": answers,
-    #     }
-
-    def extract_user_and_ground_truth(messages):
-        prompts = []
-        ground_truths = []
-
-        iterator = iter(messages)
-        for user_message, assistant_message in zip(iterator, iterator):
-            try:
-                if (
-                    user_message.get("role") == "user"
-                    and assistant_message.get("role") == "assistant"
-                ):
-                    user_prompt = extract_text_from_message(user_message)
-                    assistant_response = (
-                        assistant_message["content"][0].get("text", "").strip()
-                    )
-
-                    if user_prompt and assistant_response:
-                        prompts.append(user_prompt)
-                        ground_truths.append(assistant_response)
-            except (IndexError, KeyError, AttributeError) as e:
-                print(f"Skipping invalid message pair due to error: {e}")
-                continue
-
-        if not prompts or not ground_truths:
-            print(messages)
-            print(prompts, ground_truths)
-            raise ValueError("Failed to extract valid prompts or ground truths.")
-
-        return prompts, ground_truths
-
-    def extract_text_from_message(message):
-        try:
-            text_content = [
-                content.get("text", "").strip()
-                for content in message.get("content", [])
-                if content.get("type") == "text" and content.get("text") is not None
-            ]
-        except (AttributeError, TypeError) as e:
-            print(f"Error extracting text from message: {e}")
-            return ""
-
-        return " ".join(text_content)
+    cider_scorer = Cider()
 
     def compute_metrics(eval_preds):
         predictions, labels = eval_preds
         decoded_preds = processor.batch_decode(predictions, skip_special_tokens=True)
         decoded_labels = processor.batch_decode(labels, skip_special_tokens=True)
 
-        scores = []
-        for pred, label in zip(decoded_preds, decoded_labels):
-            pred = re.sub(r"(?:(?<=>) | (?=</s_))", "", pred)
-            scores.append(edit_distance(pred, label) / max(len(pred), len(label)))
+        # BLEU
+        bleu_scores = [sentence_bleu([ref], pred) for pred, ref in zip(decoded_preds, decoded_labels)]
 
-        return {"edit_distance": np.mean(scores)}
+        # CIDEr
+        cider_scores, _ = cider_scorer.compute_score(decoded_labels, decoded_preds)
+
+        # BERTScore
+        P, R, F1 = bert_score(decoded_preds, decoded_labels, lang="en", rescale_with_baseline=True)
+
+        return {
+            "bleu": np.mean(bleu_scores),
+            "cider": np.mean(cider_scores),
+            "bert_score_precision": P.mean().item(),
+            "bert_score_recall": R.mean().item(),
+            "bert_score_f1": F1.mean().item(),
+        }
 
     training_args = TrainingArguments(
         output_dir=output_dir,
@@ -262,7 +167,7 @@ def main():
         bf16=True,
         push_to_hub=False,
         dataloader_pin_memory=True,
-        dataloader_num_workers=4,
+        dataloader_num_workers=8,
         remove_unused_columns=False,
     )
 
