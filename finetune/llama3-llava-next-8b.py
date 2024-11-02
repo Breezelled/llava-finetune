@@ -20,14 +20,12 @@ from nltk import edit_distance
 
 def main():
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
-
     model_id = "llava-hf/llama3-llava-next-8b-hf"
     dataset_id = "HuggingFaceH4/llava-instruct-mix-vsft"
     output_dir = f"../../model/{model_id.split('/')[1]}/{dataset_id.split('/')[1]}"
     logging_dir = "../../log"
     train_batch_size = 2
-    eval_batch_size = 1
+    eval_batch_size = 2
     gradient_accumulation_steps = 1
     num_train_epochs = 1
     learning_rate = 2e-5
