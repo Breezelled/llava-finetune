@@ -12,6 +12,8 @@ from transformers import (
     BitsAndBytesConfig,
 )
 from peft import LoraConfig, prepare_model_for_kbit_training, get_peft_model
+from torch.optim import AdamW
+from liger_kernel.transformers import apply_liger_kernel_to_llama
 
 from bert_score import score as bert_score
 from nltk.translate.bleu_score import sentence_bleu
@@ -34,17 +36,19 @@ def main():
     lr_scheduler_type = "cosine"
 
     processor = LlavaNextProcessor.from_pretrained(model_id)
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.bfloat16,
-    )
+    # bnb_config = BitsAndBytesConfig(
+    #     load_in_4bit=True,
+    #     bnb_4bit_quant_type="nf4",
+    #     bnb_4bit_compute_dtype=torch.bfloat16,
+    # )
     model = LlavaNextForConditionalGeneration.from_pretrained(
         model_id,
         torch_dtype=torch.bfloat16,
-        quantization_config=bnb_config,
+        # quantization_config=bnb_config,
         attn_implementation="sdpa",
     )
+
+    # apply_liger_kernel_to_llama()
 
     model_name = model_id.split("/")[1]
 
@@ -61,12 +65,10 @@ def main():
         "width": image_size,
     }
 
-    print("Special tokens:", processor.tokenizer.special_tokens_map)
-    print("Additional special tokens:", processor.tokenizer.additional_special_tokens)
     def find_all_linear_names(model):
         cls = torch.nn.Linear
         lora_module_names = set()
-        multimodal_keywords = ["multi_modal_projector", "vision_model"]
+        multimodal_keywords = ["mm_projector", "vision_tower", "vision_resampler"]
         for name, module in model.named_modules():
             if any(mm_keyword in name for mm_keyword in multimodal_keywords):
                 continue
@@ -171,6 +173,12 @@ def main():
         remove_unused_columns=False,
     )
 
+    optimizer = AdamW(
+        model.parameters(),
+        lr=learning_rate,
+        fused=True
+    )
+
     trainer = Trainer(
         model=model,
         args=training_args,
@@ -178,6 +186,7 @@ def main():
         eval_dataset=val_dataset,
         data_collator=train_collate_fn,
         compute_metrics=compute_metrics,
+        optimizers=(optimizer, None),
     )
 
     trainer.train()
