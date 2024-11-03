@@ -1,6 +1,7 @@
 import torch
 import json
 import numpy as np
+import evaluate
 
 from datasets import load_dataset
 from transformers import (
@@ -15,9 +16,6 @@ from peft import LoraConfig, prepare_model_for_kbit_training, get_peft_model
 from torch.optim import AdamW
 from liger_kernel.transformers import apply_liger_kernel_to_llama
 
-from bert_score import score as bert_score
-from nltk.translate.bleu_score import sentence_bleu
-from pycocoevalcap.cider.cider import Cider
 
 
 def main():
@@ -34,6 +32,7 @@ def main():
     weight_decay = 0.0
     warmup_ratio = 0.03
     lr_scheduler_type = "cosine"
+    max_length = 2048
 
     processor = LlavaNextProcessor.from_pretrained(model_id)
     # bnb_config = BitsAndBytesConfig(
@@ -109,7 +108,7 @@ def main():
             padding=True,
             truncation=True,
             return_tensors="pt",
-            max_length=2048,
+            max_length=max_length,
         )
 
 
@@ -123,36 +122,32 @@ def main():
 
         return batch
 
-    cider_scorer = Cider()
+    bleu_metric = evaluate.load("bleu")
+    bertscore_metric = evaluate.load("bertscore")
 
     def compute_metrics(eval_preds):
         predictions, labels = eval_preds
         decoded_preds = processor.batch_decode(predictions, skip_special_tokens=True)
         decoded_labels = processor.batch_decode(labels, skip_special_tokens=True)
 
-        # BLEU
-        bleu_scores = [sentence_bleu([ref], pred) for pred, ref in zip(decoded_preds, decoded_labels)]
+        references = [[ref] for ref in decoded_labels]
 
-        # CIDEr
-        cider_scores, _ = cider_scorer.compute_score(decoded_labels, decoded_preds)
+        bleu_result = bleu_metric.compute(predictions=decoded_preds, references=references)
 
-        # BERTScore
-        P, R, F1 = bert_score(decoded_preds, decoded_labels, lang="en", rescale_with_baseline=True)
+        bertscore_result = bertscore_metric.compute(predictions=decoded_preds, references=decoded_labels, lang="en")
 
         return {
-            "bleu": np.mean(bleu_scores),
-            "cider": np.mean(cider_scores),
-            "bert_score_precision": P.mean().item(),
-            "bert_score_recall": R.mean().item(),
-            "bert_score_f1": F1.mean().item(),
+            "bleu": bleu_result["bleu"],
+            "bertscore_precision": np.mean(bertscore_result["precision"]),
+            "bertscore_recall": np.mean(bertscore_result["recall"]),
+            "bertscore_f1": np.mean(bertscore_result["f1"]),
         }
 
     training_args = TrainingArguments(
         output_dir=output_dir,
-        evaluation_strategy="steps",
-        eval_steps=50000,
+        eval_strategy="no",
         save_strategy="steps",
-        save_steps=50000,
+        save_steps=30000,
         per_device_train_batch_size=train_batch_size,
         per_device_eval_batch_size=eval_batch_size,
         num_train_epochs=num_train_epochs,
@@ -161,6 +156,7 @@ def main():
         warmup_ratio=warmup_ratio,
         logging_dir=logging_dir,
         logging_steps=10,
+        log_level="info",
         save_total_limit=1,
         load_best_model_at_end=True,
         gradient_checkpointing=True,
