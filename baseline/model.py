@@ -10,6 +10,8 @@ import os
 import json
 import gc
 from tqdm import tqdm
+from bert_score import score as bert_score
+from pycocoevalcap.cider.cider import Cider
 
 print(torch.cuda.is_available())
 print(torch.version.cuda)
@@ -30,22 +32,22 @@ def display_image(image):
 os.makedirs("../model", exist_ok=True)
 
 # Specify the cache directory
-# cache_dir = "../model"
+cache_dir = "../model"
 model_id = "llava-hf/llama3-llava-next-8b-hf"
 
 torch.backends.cuda.matmul.allow_tf32 = True
 print(f"TF32 Enabled: {torch.backends.cuda.matmul.allow_tf32}")
 
-processor = LlavaNextProcessor.from_pretrained(model_id)
-quantization_config = BitsAndBytesConfig(
-    load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.bfloat16
-)
+processor = LlavaNextProcessor.from_pretrained(model_id,cache_dir=cache_dir)
+# quantization_config = BitsAndBytesConfig(
+#     load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.bfloat16
+# )
 model = LlavaNextForConditionalGeneration.from_pretrained(
     model_id,
     torch_dtype=torch.bfloat16,
     device_map="auto",
     attn_implementation="sdpa",
-    quantization_config=quantization_config,
+    # quantization_config=quantization_config,
 )
 
 with open(f"../model_config/llama3-llava-next-8b-hf.json", "r") as f:
@@ -57,43 +59,21 @@ vision_feature_select_strategy = config["vision_feature_select_strategy"]
 processor.patch_size = patch_size
 processor.vision_feature_select_strategy = vision_feature_select_strategy
 
-# # prepare image and text prompt, using the appropriate prompt template
-# url = "https://github.com/haotian-liu/LLaVA/blob/1a91fc274d7c35a9b50b3cb29c4247ae5837ce39/images/llava_v1_5_radar.jpg?raw=true"
-# image = Image.open(requests.get(url, stream=True).raw)
-
-# display_image(image)
-
-# # Define a chat histiry and use `apply_chat_template` to get correctly formatted prompt
-# # Each value in "content" has to be a list of dicts with types ("text", "image")
-# test_prompt = "What is shown in this image?"
-
-# conversation = [
-#     {
-#         "role": "user",
-#         "content": [
-#             {"type": "text", "text": "What is shown in this image?"},
-#             {"type": "image"},
-#         ],
-#     },
-# ]
-# # Expanding inputs for image tokens in LLaVa-NeXT should be done in processing. Please add `patch_size` and `vision_feature_select_strategy` to the model's processing config or set directly with `processor.patch_size = {{patch_size}}` and processor.vision_feature_select_strategy = {{vision_feature_select_strategy}}`. Using processors without these attributes in the config is deprecated and will throw an error in v4.47.
-# # Setting `pad_token_id` to `eos_token_id`:None for open-end generation.
-# prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
-
-# inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device)
-
-# # autoregressively complete prompt
-# output = model.generate(**inputs, max_new_tokens=128)
-# # print(processor.decode(output[0], skip_special_tokens=True))
-# original_text = processor.decode(output[0], skip_special_tokens=True)
-# print(json.dump(original_text, f, indent=4))
-# model_output = '\n'.join(original_text.split('\n')[2:]).strip()
-# print(model_output)
 
 # Placeholder accuracy and BLEU score trackers
 correct_predictions = 0
 total_predictions = 0
 bleu_scores = []
+cider_scores = []
+bert_scores_p, bert_scores_r, bert_scores_f1 = [], [], []
+results = []
+
+batch_size = 4
+batch_inputs = []
+batch_images = []
+batch_expected_outputs = []
+
+cider_scorer = Cider()
 
 # Evaluate on a subset of the dataset (for example, 100 samples)
 for i, example in enumerate(
@@ -111,7 +91,6 @@ for i, example in enumerate(
             input_text = example["messages"][2 * j]["content"][0][
                 "text"
             ]  # Adjust based on the dataset format
-        print(type(input_text))
         image = example["images"][0]  # Adjust based on the dataset format
 
         conversation = [
@@ -140,7 +119,10 @@ for i, example in enumerate(
         original_text = processor.decode(output[0], skip_special_tokens=True)
         response_split = original_text.split("\n\n\n")[2:]
         model_output = " ".join(response_split)
+        print(f"Expected Output: {expected_output}")
+        print(f"Model Output: {model_output}")
         # For accuracy (if it's a classification task, modify this part if needed)
+        is_correct = model_output.strip() == expected_output.strip()
         if model_output.strip() == expected_output.strip():
             correct_predictions += 1
 
@@ -151,6 +133,20 @@ for i, example in enumerate(
         bleu = sentence_bleu(reference, hypothesis)
         print(f"BLEU Score: {bleu:.4f}")
         bleu_scores.append(bleu)
+        
+        # CIDEr
+        # decoded_labels = [expected_output]
+        # decoded_preds = [model_output]
+        # cider_score, _ = cider_scorer.compute_score(expected_output, model_output)
+        # cider_scores.append(cider_score)
+        # print(f"CIDEr Score: {cider_score:.4f}")
+        
+        # BERT Score
+        # P, R, F1 = bert_score([model_output], [expected_output], lang="en")
+        # bert_scores_p.append(P.item())
+        # bert_scores_r.append(R.item())
+        # bert_scores_f1.append(F1.item())
+        # print(f"BERT Score: P={P.item():.4f}, R={R.item():.4f}, F1={F1.item():.4f}")
 
         total_predictions += 1
 
@@ -162,3 +158,6 @@ average_bleu = np.mean(bleu_scores)
 
 print(f"Accuracy: {accuracy * 100:.2f}%")
 print(f"Average BLEU Score: {average_bleu:.4f}")
+print(f"Average CIDEr Score: {np.mean(cider_scores):.4f}")
+print(f"Average BERT Score: P={np.mean(bert_scores_p):.4f}, R={np.mean(bert_scores_r):.4f}, F1={np.mean(bert_scores_f1):.4f}")
+
