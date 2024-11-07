@@ -8,6 +8,7 @@ from nltk.translate.bleu_score import sentence_bleu
 import numpy as np
 from tqdm import tqdm
 import os
+from torch.utils.data import DataLoader
 
 # Check if GPU is available
 print("CUDA Available:", torch.cuda.is_available())
@@ -78,60 +79,79 @@ bleu_scores = []
 # Load the dataset for evaluation
 dataset = load_dataset("HuggingFaceH4/llava-instruct-mix-vsft", split="test", cache_dir=cache_dir)
 
-# Iterate over the dataset to evaluate the model
-for i, example in enumerate(tqdm(dataset, desc="Processing examples")):
-    print(f"Example {i + 1}/{len(dataset)}")
+# Define the batch size
+batch_size = 1
 
-    # Extract image and text prompt from the dataset
-    image = example["images"][0]  # Get the image from the example
-    nb_messages = len(example["messages"]) // 2
+# Create DataLoader for batch processing
+dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=lambda x: x)
 
-    for j in range(int(nb_messages)):
-        print(f"Message {j + 1}/{nb_messages}")
+# Iterate over the DataLoader to evaluate the model in batches
+for batch in tqdm(dataloader, desc="Processing batches"):
+    images = []
+    conversation_contexts = [[] for _ in range(len(batch))]  # Initialize conversation context for each example in the batch
+    ground_truths = []
+    generated_outputs = []
 
-        if example["messages"][2 * j]["content"][0]["index"] == 0:
-            input_text = example["messages"][2 * j]["content"][1]["text"]
-        else:
-            input_text = example["messages"][2 * j]["content"][0]["text"]
+    # Process each example in the batch
+    for i, example in enumerate(batch):
+        image = example["images"][0]
+        nb_messages = len(example["messages"]) // 2
 
-        expected_output = example["messages"][2 * j + 1]["content"][0]["text"]  # Expected response text
-        conversation = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": input_text},
-                    {"type": "image"},
-                ],
-            },
-        ]
-        prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
+        for j in range(int(nb_messages)):
+            if example["messages"][2 * j]["content"][0]["index"] == 0:
+                input_text = example["messages"][2 * j]["content"][1]["text"]
+            else:
+                input_text = example["messages"][2 * j]["content"][0]["text"]
 
-        # Prepare inputs for model generation
-        inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device)
-        inputs = inputs.to(torch.bfloat16)
+            ground_truth = example["messages"][2 * j + 1]["content"][0]["text"]  # Assistant's true answer
 
-        # Generate response from the model
-        output = model.generate(**inputs, max_new_tokens=128)
-        model_output = processor.decode(output[0], skip_special_tokens=True)
+            # Accumulate context by adding current input and model output from previous rounds
+            conversation = conversation_contexts[i] + [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": input_text},
+                        {"type": "image"},
+                    ],
+                },
+            ]
+            prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
 
-        # Print the prompt, model output, and expected output for comparison
-        print("Prompt:", prompt)
-        print("Model Output:", model_output)
-        print("Expected Output:", expected_output)
+            # Prepare input for model generation
+            images.append(image)
+            input_texts = [prompt]
 
-        # Calculate accuracy (exact match comparison)
-        if model_output.strip() == expected_output.strip():
-            correct_predictions += 1
+            # Prepare inputs for the model
+            inputs = processor(images=images, text=input_texts, return_tensors="pt", padding=True).to(model.device)
+            inputs = inputs.to(torch.bfloat16)
 
-        # Calculate BLEU score
-        reference = [expected_output.split()]  # Tokenized reference text
-        hypothesis = model_output.split()  # Tokenized model output
-        bleu = sentence_bleu(reference, hypothesis)
-        print(f"BLEU Score: {bleu:.4f}")
-        bleu_scores.append(bleu)
+            # Generate responses from the model
+            with torch.no_grad():
+                output_ids = model.generate(**inputs, max_new_tokens=128)
+            model_output = processor.decode(output_ids[0], skip_special_tokens=True)
 
-        # Increment total prediction count
-        total_predictions += 1
+            # Update conversation contexts with model output and ground truth for metrics
+            conversation_contexts[i].append({"role": "user", "content": [{"type": "text", "text": input_text}]})
+            conversation_contexts[i].append({"role": "assistant", "content": [{"type": "text", "text": model_output}]})
+            ground_truths.append(ground_truth)
+            generated_outputs.append(model_output)
+
+            # Accuracy (exact match)
+            if model_output.strip() == ground_truth.strip():
+                correct_predictions += 1
+
+            # BLEU score
+            reference = [ground_truth.split()]
+            hypothesis = model_output.split()
+            bleu = sentence_bleu(reference, hypothesis)
+            bleu_scores.append(bleu)
+
+            # Clear the images and prompts for the next round in the conversation
+            images.clear()
+            input_texts.clear()
+
+    # Increment total prediction count
+    total_predictions += len(ground_truths)
 
 # Calculate final accuracy and average BLEU score across the dataset
 accuracy = correct_predictions / total_predictions
@@ -140,3 +160,72 @@ average_bleu = np.mean(bleu_scores)
 # Print final evaluation results
 print(f"Accuracy: {accuracy * 100:.2f}%")
 print(f"Average BLEU Score: {average_bleu:.4f}")
+
+
+
+#
+# # Load the dataset for evaluation
+# dataset = load_dataset("HuggingFaceH4/llava-instruct-mix-vsft", split="test", cache_dir=cache_dir)
+#
+# # Iterate over the dataset to evaluate the model
+# for i, example in enumerate(tqdm(dataset, desc="Processing examples")):
+#     print(f"Example {i + 1}/{len(dataset)}")
+#
+#     # Extract image and text prompt from the dataset
+#     image = example["images"][0]  # Get the image from the example
+#     nb_messages = len(example["messages"]) // 2
+#
+#     for j in range(int(nb_messages)):
+#         print(f"Message {j + 1}/{nb_messages}")
+#
+#         if example["messages"][2 * j]["content"][0]["index"] == 0:
+#             input_text = example["messages"][2 * j]["content"][1]["text"]
+#         else:
+#             input_text = example["messages"][2 * j]["content"][0]["text"]
+#
+#         expected_output = example["messages"][2 * j + 1]["content"][0]["text"]  # Expected response text
+#         conversation = [
+#             {
+#                 "role": "user",
+#                 "content": [
+#                     {"type": "text", "text": input_text},
+#                     {"type": "image"},
+#                 ],
+#             },
+#         ]
+#         prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
+#
+#         # Prepare inputs for model generation
+#         inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device)
+#         inputs = inputs.to(torch.bfloat16)
+#
+#         # Generate response from the model
+#         output = model.generate(**inputs, max_new_tokens=128)
+#         model_output = processor.decode(output[0], skip_special_tokens=True)
+#
+#         # Print the prompt, model output, and expected output for comparison
+#         print("Prompt:", prompt)
+#         print("Model Output:", model_output)
+#         print("Expected Output:", expected_output)
+#
+#         # Calculate accuracy (exact match comparison)
+#         if model_output.strip() == expected_output.strip():
+#             correct_predictions += 1
+#
+#         # Calculate BLEU score
+#         reference = [expected_output.split()]  # Tokenized reference text
+#         hypothesis = model_output.split()  # Tokenized model output
+#         bleu = sentence_bleu(reference, hypothesis)
+#         print(f"BLEU Score: {bleu:.4f}")
+#         bleu_scores.append(bleu)
+#
+#         # Increment total prediction count
+#         total_predictions += 1
+#
+# # Calculate final accuracy and average BLEU score across the dataset
+# accuracy = correct_predictions / total_predictions
+# average_bleu = np.mean(bleu_scores)
+#
+# # Print final evaluation results
+# print(f"Accuracy: {accuracy * 100:.2f}%")
+# print(f"Average BLEU Score: {average_bleu:.4f}")
