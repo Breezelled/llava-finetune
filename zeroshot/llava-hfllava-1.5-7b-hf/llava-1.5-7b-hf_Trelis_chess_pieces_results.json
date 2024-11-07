@@ -1,0 +1,49 @@
+{
+    "results": [
+        {
+            "Example": 1,
+            "Expected Output": "A white bishop with a white knight.",
+            "Model Output": "The chest pieces on the wooden table include a knight, a rook, and a pawn. The knights are white, the rooks are black, while the paawns are brown.",
+            "BLEU Score": 0.009849574084214482,
+            "BERT Score": {
+                "P": 0.02412780560553074,
+                "R": 0.2910228371620178,
+                "F1": 0.1554587185382843
+            },
+            "Correct Prediction": false
+        },
+        {
+            "Example": 2,
+            "Expected Output": "A black rook, a black bishop and a white bishop all standing together.",
+            "Model Output": "The chest pieces on the wooden table include a knight, a rook, and a pawn. The knights are brown, the rooks are black, while the paons are white.",
+            "BLEU Score": 0.025927732347438295,
+            "BERT Score": {
+                "P": 0.1373402178287506,
+                "R": 0.283899188041687,
+                "F1": 0.21086347103118896
+            },
+            "Correct Prediction": false
+        },
+        {
+            "Example": 3,
+            "Expected Output": "A black knight and a white rook. There is also half of what appears to be a black pawn to the side.",
+            "Model Output": "The chest pieces on the wooden table include a knight, a rook, and a queen. The knights are black, the rooks are brown, while the queen is white.",
+            "BLEU Score": 0.027415239110359608,
+            "BERT Score": {
+                "P": 0.22189614176750183,
+                "R": 0.25636881589889526,
+                "F1": 0.24031223356723785
+            },
+            "Correct Prediction": false
+        }
+    ],
+    "summary": {
+        "Accuracy": 0.0,
+        "Average BLEU Score": 0.021064181847337462,
+        "Average BERT Score": {
+            "P": 0.12778805506726107,
+            "R": 0.2770969470342,
+            "F1": 0.20221147437890372
+        }
+    }
+}
