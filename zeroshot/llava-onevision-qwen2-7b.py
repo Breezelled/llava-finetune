@@ -164,7 +164,7 @@ for batch in tqdm(dataloader, desc="Processing batches"):
     bertscore_scores["precision"].extend(bertscore_result["precision"])
     bertscore_scores["recall"].extend(bertscore_result["recall"])
     bertscore_scores["f1"].extend(bertscore_result["f1"])
-    print(f"BLEU: {bleu_result['bleu']:.4f}, BERTScore: {bertscore_result['f1']:.4f}")
+    print(f"BLEU: {bleu_result['bleu']:.4f}, BERTScore F1: {np.mean(bertscore_result['f1']):.4f}")
 
 # Calculate final accuracy and average BLEU score across the dataset
 accuracy = correct_predictions / total_predictions
