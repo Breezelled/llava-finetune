@@ -22,10 +22,10 @@ def main():
 
     model_id = "llava-hf/llama3-llava-next-8b-hf"
     dataset_id = "HuggingFaceH4/llava-instruct-mix-vsft"
-    output_dir = f"../../model/{model_id.split('/')[1]}/{dataset_id.split('/')[1]}"
-    logging_dir = "../../log"
-    train_batch_size = 4
-    eval_batch_size = 2
+    output_dir = f"../model/{model_id.split('/')[1]}/{dataset_id.split('/')[1]}"
+    # logging_dir = "../../log"
+    train_batch_size = 2
+    eval_batch_size = 1
     gradient_accumulation_steps = 1
     num_train_epochs = 1
     learning_rate = 2e-5
@@ -95,7 +95,10 @@ def main():
     val_dataset = load_dataset(dataset_id, split="test")
 
     def train_collate_fn(examples):
-        texts = [processor.apply_chat_template(example["messages"], tokenize=False) for example in examples]
+        texts = [
+            processor.apply_chat_template(example["messages"], tokenize=False)
+            for example in examples
+        ]
         images = [example["images"] for example in examples]
 
         if isinstance(model, LlavaForConditionalGeneration):
@@ -111,7 +114,6 @@ def main():
             max_length=max_length,
         )
 
-
         labels = batch["input_ids"].clone()
         labels[labels == processor.tokenizer.pad_token_id] = -100
         batch["labels"] = labels
@@ -121,27 +123,31 @@ def main():
         ), "Batch contains None values"
 
         return batch
+    
+    # bleu_metric = evaluate.load("bleu")
+    # bertscore_metric = evaluate.load("bertscore")
 
-    bleu_metric = evaluate.load("bleu")
-    bertscore_metric = evaluate.load("bertscore")
+    # def compute_metrics(eval_preds):
+    #     predictions, labels = eval_preds
+    #     decoded_preds = processor.batch_decode(predictions, skip_special_tokens=True)
+    #     decoded_labels = processor.batch_decode(labels, skip_special_tokens=True)
 
-    def compute_metrics(eval_preds):
-        predictions, labels = eval_preds
-        decoded_preds = processor.batch_decode(predictions, skip_special_tokens=True)
-        decoded_labels = processor.batch_decode(labels, skip_special_tokens=True)
+    #     references = [[ref] for ref in decoded_labels]
 
-        references = [[ref] for ref in decoded_labels]
+    #     bleu_result = bleu_metric.compute(
+    #         predictions=decoded_preds, references=references
+    #     )
 
-        bleu_result = bleu_metric.compute(predictions=decoded_preds, references=references)
+    #     bertscore_result = bertscore_metric.compute(
+    #         predictions=decoded_preds, references=decoded_labels, lang="en"
+    #     )
 
-        bertscore_result = bertscore_metric.compute(predictions=decoded_preds, references=decoded_labels, lang="en")
-
-        return {
-            "bleu": bleu_result["bleu"],
-            "bertscore_precision": np.mean(bertscore_result["precision"]),
-            "bertscore_recall": np.mean(bertscore_result["recall"]),
-            "bertscore_f1": np.mean(bertscore_result["f1"]),
-        }
+    #     return {
+    #         "bleu": bleu_result["bleu"],
+    #         "bertscore_precision": np.mean(bertscore_result["precision"]),
+    #         "bertscore_recall": np.mean(bertscore_result["recall"]),
+    #         "bertscore_f1": np.mean(bertscore_result["f1"]),
+    #     }
 
     training_args = TrainingArguments(
         output_dir=output_dir,
@@ -154,11 +160,10 @@ def main():
         learning_rate=learning_rate,
         weight_decay=weight_decay,
         warmup_ratio=warmup_ratio,
-        logging_dir=logging_dir,
         logging_steps=10,
-        log_level="info",
+        logging_strategy="steps",
         save_total_limit=1,
-        load_best_model_at_end=True,
+        load_best_model_at_end=False,
         gradient_checkpointing=True,
         gradient_accumulation_steps=gradient_accumulation_steps,
         lr_scheduler_type=lr_scheduler_type,
@@ -169,11 +174,7 @@ def main():
         remove_unused_columns=False,
     )
 
-    optimizer = AdamW(
-        model.parameters(),
-        lr=learning_rate,
-        fused=True
-    )
+    optimizer = AdamW(model.parameters(), lr=learning_rate, fused=True)
 
     trainer = Trainer(
         model=model,
@@ -188,8 +189,8 @@ def main():
     trainer.train()
     trainer.save_model(output_dir)
 
-    test_results = trainer.predict(val_dataset)
-    print(test_results)
+    # test_results = trainer.predict(val_dataset)
+    # print(test_results)
 
 
 if __name__ == "__main__":

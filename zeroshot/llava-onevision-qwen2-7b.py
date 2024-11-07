@@ -4,11 +4,11 @@ from PIL import Image
 import requests
 import json
 from datasets import load_dataset
-from nltk.translate.bleu_score import sentence_bleu
 import numpy as np
 from tqdm import tqdm
 import os
 from torch.utils.data import DataLoader
+import evaluate
 
 # Check if GPU is available
 print("CUDA Available:", torch.cuda.is_available())
@@ -19,11 +19,11 @@ print("CUDA Version:", torch.version.cuda)
 
 # Define model ID and cache directory for data
 model_id = "llava-hf/llava-onevision-qwen2-7b-ov-hf"
-cache_dir = "../data"
-os.makedirs(cache_dir, exist_ok=True)
+# cache_dir = "../data"
+# os.makedirs(cache_dir, exist_ok=True)
 
-torch.backends.cuda.matmul.allow_tf32 = True
-print(f"TF32 Enabled: {torch.backends.cuda.matmul.allow_tf32}")
+# torch.backends.cuda.matmul.allow_tf32 = True
+# print(f"TF32 Enabled: {torch.backends.cuda.matmul.allow_tf32}")
 
 # Load the LLaVA-OneVision model and processor
 processor = AutoProcessor.from_pretrained(model_id)
@@ -44,9 +44,9 @@ model = LlavaOnevisionForConditionalGeneration.from_pretrained(
 )
 
 # Manually convert the bias to bfloat16
-for name, param in model.named_parameters():
-    if "bias" in name:
-        param.data = param.data.type(torch.bfloat16)
+# for name, param in model.named_parameters():
+#     if "bias" in name:
+#         param.data = param.data.type(torch.bfloat16)
 
 
 # url = "https://github.com/haotian-liu/LLaVA/blob/1a91fc274d7c35a9b50b3cb29c4247ae5837ce39/images/llava_v1_5_radar.jpg?raw=true"
@@ -75,15 +75,19 @@ for name, param in model.named_parameters():
 correct_predictions = 0
 total_predictions = 0
 bleu_scores = []
+bertscore_scores = {"precision": [], "recall": [], "f1": []}
 
 # Load the dataset for evaluation
-dataset = load_dataset("HuggingFaceH4/llava-instruct-mix-vsft", split="test", cache_dir=cache_dir)
+dataset = load_dataset("HuggingFaceH4/llava-instruct-mix-vsft", split="test")
 
 # Define the batch size
 batch_size = 1
 
 # Create DataLoader for batch processing
 dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=lambda x: x)
+
+bleu_metric = evaluate.load("bleu")
+bertscore_metric = evaluate.load("bertscore")
 
 # Iterate over the DataLoader to evaluate the model in batches
 for batch in tqdm(dataloader, desc="Processing batches"):
@@ -141,10 +145,10 @@ for batch in tqdm(dataloader, desc="Processing batches"):
                 correct_predictions += 1
 
             # BLEU score
-            reference = [ground_truth.split()]
-            hypothesis = model_output.split()
-            bleu = sentence_bleu(reference, hypothesis)
-            bleu_scores.append(bleu)
+            # reference = [ground_truth.split()]
+            # hypothesis = model_output.split()
+            # bleu = sentence_bleu(reference, hypothesis)
+            # bleu_scores.append(bleu)
 
             # Clear the images and prompts for the next round in the conversation
             images.clear()
@@ -153,14 +157,30 @@ for batch in tqdm(dataloader, desc="Processing batches"):
     # Increment total prediction count
     total_predictions += len(ground_truths)
 
+    bleu_result = bleu_metric.compute(predictions=generated_outputs, references=[[gt] for gt in ground_truths])
+    bleu_scores.append(bleu_result["bleu"])
+
+    bertscore_result = bertscore_metric.compute(predictions=generated_outputs, references=ground_truths, lang="en", model_type="roberta-large")
+    bertscore_scores["precision"].extend(bertscore_result["precision"])
+    bertscore_scores["recall"].extend(bertscore_result["recall"])
+    bertscore_scores["f1"].extend(bertscore_result["f1"])
+    print(f"BLEU: {bleu_result['bleu']:.4f}, BERTScore: {bertscore_result['f1']:.4f}")
+
 # Calculate final accuracy and average BLEU score across the dataset
 accuracy = correct_predictions / total_predictions
 average_bleu = np.mean(bleu_scores)
+average_bertscore = {
+    "precision": np.mean(bertscore_scores["precision"]),
+    "recall": np.mean(bertscore_scores["recall"]),
+    "f1": np.mean(bertscore_scores["f1"]),
+}
 
 # Print final evaluation results
 print(f"Accuracy: {accuracy * 100:.2f}%")
 print(f"Average BLEU Score: {average_bleu:.4f}")
-
+print(f"Average BERTScore Precision: {average_bertscore['precision']:.4f}")
+print(f"Average BERTScore Recall: {average_bertscore['recall']:.4f}")
+print(f"Average BERTScore F1: {average_bertscore['f1']:.4f}")
 
 
 #

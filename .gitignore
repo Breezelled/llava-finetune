@@ -1,8 +1,14 @@
 /data
 /.vscode
 /baseline/__pycache__
-/model
 
 script
 
 /Breeze
+
+/finetune
+
+/benchmark/src
+/benchmark/VLMEvalKit
+
+/model
