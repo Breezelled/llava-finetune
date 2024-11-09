@@ -6,8 +6,6 @@ script
 
 /Breeze
 
-/finetune
-
 /benchmark/src
 /benchmark/VLMEvalKit
 

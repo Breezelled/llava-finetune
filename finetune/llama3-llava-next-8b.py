@@ -1,7 +1,5 @@
 import torch
 import json
-import numpy as np
-import evaluate
 
 from datasets import load_dataset
 from transformers import (
@@ -23,7 +21,6 @@ def main():
     model_id = "llava-hf/llama3-llava-next-8b-hf"
     dataset_id = "HuggingFaceH4/llava-instruct-mix-vsft"
     output_dir = f"../model/{model_id.split('/')[1]}/{dataset_id.split('/')[1]}"
-    # logging_dir = "../../log"
     train_batch_size = 2
     eval_batch_size = 1
     gradient_accumulation_steps = 1
@@ -123,31 +120,6 @@ def main():
         ), "Batch contains None values"
 
         return batch
-    
-    # bleu_metric = evaluate.load("bleu")
-    # bertscore_metric = evaluate.load("bertscore")
-
-    # def compute_metrics(eval_preds):
-    #     predictions, labels = eval_preds
-    #     decoded_preds = processor.batch_decode(predictions, skip_special_tokens=True)
-    #     decoded_labels = processor.batch_decode(labels, skip_special_tokens=True)
-
-    #     references = [[ref] for ref in decoded_labels]
-
-    #     bleu_result = bleu_metric.compute(
-    #         predictions=decoded_preds, references=references
-    #     )
-
-    #     bertscore_result = bertscore_metric.compute(
-    #         predictions=decoded_preds, references=decoded_labels, lang="en"
-    #     )
-
-    #     return {
-    #         "bleu": bleu_result["bleu"],
-    #         "bertscore_precision": np.mean(bertscore_result["precision"]),
-    #         "bertscore_recall": np.mean(bertscore_result["recall"]),
-    #         "bertscore_f1": np.mean(bertscore_result["f1"]),
-    #     }
 
     training_args = TrainingArguments(
         output_dir=output_dir,
@@ -180,9 +152,7 @@ def main():
         model=model,
         args=training_args,
         train_dataset=train_dataset,
-        eval_dataset=val_dataset,
         data_collator=train_collate_fn,
-        compute_metrics=compute_metrics,
         optimizers=(optimizer, None),
     )
 

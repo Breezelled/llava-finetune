@@ -1,22 +1,19 @@
-from nltk.translate.bleu_score import sentence_bleu
 import numpy as np
 from data_inspection import dataset
 from transformers import LlavaNextProcessor, LlavaNextForConditionalGeneration, BitsAndBytesConfig
 import torch
 from PIL import Image
-import requests
 import matplotlib.pyplot as plt
 import os
 import json
 import gc
 from tqdm import tqdm
-from bert_score import score as bert_score
-from pycocoevalcap.cider.cider import Cider
 from datasets import load_dataset
 import evaluate
 from torch.utils.data import DataLoader
 
-
+max_length = 4096
+max_new_tokens = 256
 
 # Check if GPU is available
 print("CUDA Available:", torch.cuda.is_available())
@@ -24,23 +21,23 @@ print("CUDA Version:", torch.version.cuda)
 
 
 # Create the "model" folder in the parent directory if it doesn't exist
-os.makedirs("../model", exist_ok=True)
+# os.makedirs("../model", exist_ok=True)
 
 # Specify the cache directory
-cache_dir = "../model"
+# cache_dir = "../model"
 model_id = "llava-hf/llama3-llava-next-8b-hf"
 
-torch.backends.cuda.matmul.allow_tf32 = True
+# torch.backends.cuda.matmul.allow_tf32 = True
 print(f"TF32 Enabled: {torch.backends.cuda.matmul.allow_tf32}")
 
 # Create the "data" folder in the parent directory if it doesn't exist
-os.makedirs("../data", exist_ok=True)
+# os.makedirs("../data", exist_ok=True)
 
 
 # Load the dataset and specify the cache directory
-dataset = load_dataset("HuggingFaceH4/llava-instruct-mix-vsft", split="test", cache_dir="../data")
+dataset = load_dataset("HuggingFaceH4/llava-instruct-mix-vsft", split="test")
 
-processor = LlavaNextProcessor.from_pretrained(model_id,cache_dir=cache_dir)
+processor = LlavaNextProcessor.from_pretrained(model_id)
 # quantization_config = BitsAndBytesConfig(
 #     load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.bfloat16
 # )
@@ -74,7 +71,7 @@ bertscore_scores = {"precision": [], "recall": [], "f1": []}
 
 batch_size = 1
 
-dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=lambda x: x)
+dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=lambda x: x, num_workers=4)
 
 bleu_metric = evaluate.load("bleu")
 bertscore_metric = evaluate.load("bertscore")
@@ -115,12 +112,12 @@ for batch in tqdm(dataloader, desc="Processing batches"):
             input_texts = [prompt]
 
             # Prepare inputs for the model
-            inputs = processor(images=images, text=input_texts, return_tensors="pt", padding=True, max_length=4096).to(model.device)
+            inputs = processor(images=images, text=input_texts, return_tensors="pt", padding=True, max_length=max_length).to(model.device)
             inputs = inputs.to(torch.bfloat16)
 
             # Generate responses from the model
             with torch.no_grad():
-                output_ids = model.generate(**inputs, max_new_tokens=128)
+                output_ids = model.generate(**inputs, max_new_tokens=max_new_tokens)
             model_output = processor.decode(output_ids[0], skip_special_tokens=True)
 
             # Update conversation contexts with model output and ground truth for metrics
