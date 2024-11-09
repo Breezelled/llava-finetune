@@ -1,0 +1,40 @@
+[
+    {
+        "Expected Output": "A white bishop with a white knight.",
+        "Model Output": "Checkmate: A Moment of Victory",
+        "BLEU Score": 0.0000,
+        "BERT Score": {
+            "P": 0.0903,
+            "R": 0.1361,
+            "F1": 0.1145
+        }
+    },
+    {
+        "Expected Output": "A black rook, a black bishop and a white bishop all standing together.",
+        "Model Output": "Chess Pieces in a Moment of Rest",
+        "BLEU Score": 0.0000,
+        "BERT Score": {
+            "P": 0.1203,
+            "R": -0.0036,
+            "F1": 0.0591
+        }
+    },
+    {
+        "Expected Output": "A black knight and a white rook. There is also half of what appears to be a black pawn to the side.",
+        "Model Output": "Checkmate: A Moment of Victory",
+        "BLEU Score": 0.0000,
+        "BERT Score": {
+            "P": -0.0016,
+            "R": -0.0578,
+            "F1": -0.0282
+        }
+    }
+]
+
+
+
+
+
+Accuracy: 0.00%
+Average BLEU Score: 0.0000
+Average BERT Score: P=0.0697, R=0.0249, F1=0.0485

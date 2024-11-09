@@ -13,10 +13,12 @@ os.makedirs("../data", exist_ok=True)
 
 # Load the dataset and specify the cache directory
 dataset = load_dataset("HuggingFaceH4/llava-instruct-mix-vsft")
+# dataset = load_dataset("Trelis/chess_pieces", cache_dir="../data")
 
 
 
-# print(dataset["test"][1])
+
+print(dataset["test"][0])
 
 # print(json.dumps(dataset["test"][1]["messages"], indent=2))
 

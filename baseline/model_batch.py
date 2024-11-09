@@ -115,7 +115,7 @@ for batch in tqdm(dataloader, desc="Processing batches"):
             input_texts = [prompt]
 
             # Prepare inputs for the model
-            inputs = processor(images=images, text=input_texts, return_tensors="pt", padding=True).to(model.device)
+            inputs = processor(images=images, text=input_texts, return_tensors="pt", padding=True, max_length=4096).to(model.device)
             inputs = inputs.to(torch.bfloat16)
 
             # Generate responses from the model
