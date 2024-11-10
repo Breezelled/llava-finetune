@@ -10,6 +10,9 @@ import os
 from torch.utils.data import DataLoader
 import evaluate
 
+max_length = 4096
+max_new_tokens = 256
+
 # Check if GPU is available
 print("CUDA Available:", torch.cuda.is_available())
 print("CUDA Version:", torch.version.cuda)
@@ -43,33 +46,17 @@ model = LlavaOnevisionForConditionalGeneration.from_pretrained(
     #     quantization_config=quantization_config,
 )
 
-# Manually convert the bias to bfloat16
-# for name, param in model.named_parameters():
-#     if "bias" in name:
-#         param.data = param.data.type(torch.bfloat16)
+patch_size = model.config.vision_config.patch_size
+vision_feature_select_strategy = getattr(model.config, 'vision_feature_select_strategy', 'default')
+image_size = model.config.vision_config.image_size
 
-
-# url = "https://github.com/haotian-liu/LLaVA/blob/1a91fc274d7c35a9b50b3cb29c4247ae5837ce39/images/llava_v1_5_radar.jpg?raw=true"
-# image = Image.open(requests.get(url, stream=True).raw)
-
-# conversation = [
-#     {
-#         "role": "user",
-#         "content": [
-#             {"type": "image"},
-#             {"type": "text", "text": "What is shown in this image?"},
-#         ],
-#     },
-# ]
-# prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
-# inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device)
-
-# # inputs["pixel_values"] = inputs["pixel_values"].type(torch.float16)
-# inputs = inputs.to(torch.bfloat16)
-
-# output = model.generate(**inputs, max_new_tokens=10)
-# print(processor.decode(output[0], skip_special_tokens=True))
-
+processor.patch_size = patch_size
+processor.image_processor.patch_size = patch_size
+processor.vision_feature_select_strategy = vision_feature_select_strategy
+processor.image_processor.size = {
+        "height": image_size,
+        "width": image_size,
+    }
 
 # Initialize counters and metrics for evaluation
 correct_predictions = 0
@@ -84,12 +71,13 @@ dataset = load_dataset("HuggingFaceH4/llava-instruct-mix-vsft", split="test")
 batch_size = 1
 
 # Create DataLoader for batch processing
-dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=lambda x: x)
+dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=lambda x: x, num_workers=4)
 
 bleu_metric = evaluate.load("bleu")
 bertscore_metric = evaluate.load("bertscore")
 
 # Iterate over the DataLoader to evaluate the model in batches
+
 for batch in tqdm(dataloader, desc="Processing batches"):
     images = []
     conversation_contexts = [[] for _ in range(len(batch))]  # Initialize conversation context for each example in the batch
@@ -126,17 +114,17 @@ for batch in tqdm(dataloader, desc="Processing batches"):
             input_texts = [prompt]
 
             # Prepare inputs for the model
-            inputs = processor(images=images, text=input_texts, return_tensors="pt", padding=True).to(model.device)
+            inputs = processor(images=images, text=input_texts, return_tensors="pt", padding=True, max_length=max_length).to(model.device)
             inputs = inputs.to(torch.bfloat16)
 
             # Generate responses from the model
             with torch.no_grad():
-                output_ids = model.generate(**inputs, max_new_tokens=128)
+                output_ids = model.generate(**inputs, max_new_tokens=max_new_tokens)
             model_output = processor.decode(output_ids[0], skip_special_tokens=True)
 
             # Update conversation contexts with model output and ground truth for metrics
             conversation_contexts[i].append({"role": "user", "content": [{"type": "text", "text": input_text}]})
-            conversation_contexts[i].append({"role": "assistant", "content": [{"type": "text", "text": model_output}]})
+            conversation_contexts[i].append({"role": "assistant", "content": [{"type": "text", "text": model_output.strip().split("\n")[-1]}]})
             ground_truths.append(ground_truth)
             generated_outputs.append(model_output)
 
