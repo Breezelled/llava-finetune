@@ -7,10 +7,9 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import LlavaNextProcessor, LlavaNextForConditionalGeneration
 
-def main():
-    model_id = "../model/llama3-llava-next-8b-hf/llava-instruct-mix-vsft"
+def main(model_id):
     pretrained_id = "llava-hf/llama3-llava-next-8b-hf"
-    dataset_id = "HuggingFaceH4/llava-instruct-mix-vsft"
+    dataset_id = "Trelis/chess_pieces"
     eval_batch_size = 1
     max_length = 4096
     max_new_tokens = 256
@@ -49,64 +48,38 @@ def main():
         bleu_scores = []
         bertscore_scores = {"precision": [], "recall": [], "f1": []}
 
-        for batch in tqdm(test_dataloader, desc="Processing batches"):
-            images = []
-            conversation_contexts = [[] for _ in range(len(batch))]
-            ground_truths = []
-            generated_outputs = []
+        for example in tqdm(test_dataloader, desc="Processing examples"):
 
-            for i, example in enumerate(batch):
-                image = example["images"][0]
-                nb_messages = len(example["messages"]) // 2
+            image = example["image"]
+            expected_output = example["caption"]
 
-                for j in range(nb_messages):
-                    if example["messages"][2 * j]["content"][0]["index"] == 0:
-                        input_text = example["messages"][2 * j]["content"][1]["text"]
-                    else:
-                        input_text = example["messages"][2 * j]["content"][0]["text"]
+            conversation = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Caption this image."},
+                        {"type": "image"},
+                    ],
+                },
+            ]
+            prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
 
-                    ground_truth = example["messages"][2 * j + 1]["content"][0]["text"]
+            inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device)
 
-                    conversation = conversation_contexts[i] + [
-                        {
-                            "role": "user",
-                            "content": [
-                                {"type": "text", "text": input_text},
-                                {"type": "image"},
-                            ],
-                        },
-                    ]
-                    prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
+            with torch.no_grad():
+                output_ids = model.generate(**inputs, max_new_tokens=max_new_tokens)
+            model_output = processor.decode(output_ids[0], skip_special_tokens=True)
 
-                    images.append(image)
-                    input_texts = [prompt]
+            conversation_contexts = [{"role": "user", "content": [{"type": "text", "text": "Caption this image."}]}]
+            conversation_contexts.append({"role": "assistant", "content": [{"type": "text", "text": model_output.strip()}]})
 
-                    inputs = processor(
-                        images=images,
-                        text=input_texts,
-                        return_tensors="pt",
-                        padding=True,
-                        max_length=max_length,
-                        # truncation=True,
-                    ).to("cuda")
-                    inputs = inputs.to(torch.bfloat16)
+            ground_truths = [expected_output]
+            generated_outputs = [model_output]
 
-                    with torch.no_grad():
-                        output_ids = model.generate(**inputs, max_new_tokens=max_new_tokens)
-                    model_output = processor.decode(output_ids[0], skip_special_tokens=True)
+            if model_output.strip() == expected_output.strip():
+                correct_predictions += 1
 
-                    conversation_contexts[i].append({"role": "user", "content": [{"type": "text", "text": input_text}]})
-                    conversation_contexts[i].append({"role": "assistant", "content": [{"type": "text", "text": model_output}]})
-                    ground_truths.append(ground_truth)
-                    generated_outputs.append(model_output)
-
-                    if model_output.strip() == ground_truth.strip():
-                        correct_predictions += 1
-
-                    images.clear()
-                    input_texts.clear()
-
-            total_predictions += len(ground_truths)
+            total_predictions += 1
 
             bleu_result = bleu_metric.compute(predictions=generated_outputs, references=[[gt] for gt in ground_truths])
             bleu_scores.append(bleu_result["bleu"])
@@ -140,4 +113,10 @@ def main():
     evaluate_fn()
 
 if __name__ == "__main__":
-    main()
+    finetuned_general_model_id = "../model/llama3-llava-next-8b-hf/llava-instruct-mix-vsft"
+    finetuned_specific_model_id = "../model/llama3-llava-next-8b-hf/chess_pieces"
+    pretrained_model_id = "llava-hf/llama3-llava-next-8b-hf"
+
+    main(finetuned_general_model_id)
+    main(finetuned_specific_model_id)
+    main(pretrained_model_id)

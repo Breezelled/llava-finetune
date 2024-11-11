@@ -20,20 +20,18 @@ def main():
 
     model_id = "llava-hf/llama3-llava-next-8b-hf"
     dataset_id = "Trelis/chess_pieces"
-    dataset = load_dataset("Trelis/chess_pieces", cache_dir="../data")
     output_dir = f"../model/{model_id.split('/')[1]}/{dataset_id.split('/')[1]}"
-    train_batch_size = 2
+    train_batch_size = 1
     eval_batch_size = 1
     gradient_accumulation_steps = 1
-    num_train_epochs = 1
+    num_train_epochs = 3
     learning_rate = 2e-5
     weight_decay = 0.0
     warmup_ratio = 0.03
     lr_scheduler_type = "cosine"
-    max_length = 2048
-    cache_dir = "../model"
+    max_length = 4096
 
-    processor = LlavaNextProcessor.from_pretrained(model_id, cache_dir=cache_dir)
+    processor = LlavaNextProcessor.from_pretrained(model_id)
     # bnb_config = BitsAndBytesConfig(
     #     load_in_4bit=True,
     #     bnb_4bit_quant_type="nf4",
@@ -79,8 +77,8 @@ def main():
         return list(lora_module_names)
 
     lora_config = LoraConfig(
-        r=8,
-        lora_alpha=16,
+        r=2,
+        lora_alpha=4,
         lora_dropout=0.05,
         target_modules=find_all_linear_names(model),
         # target_modules="all-linear",
@@ -88,10 +86,9 @@ def main():
     )
 
     model = prepare_model_for_kbit_training(model)
-    model = get_peft_model(model, lora_config)
+    model = get_peft_model(model, lora_config).to("cuda")
 
-    train_dataset = load_dataset(dataset_id, split="train", cache_dir="../data")
-    val_dataset = load_dataset(dataset_id, split="test")
+    train_dataset = load_dataset(dataset_id, split="train")
 
     def train_collate_fn(examples):
         texts = []
@@ -137,14 +134,14 @@ def main():
         output_dir=output_dir,
         eval_strategy="no",
         save_strategy="steps",
-        save_steps=30000,
+        # save_steps=30000,
         per_device_train_batch_size=train_batch_size,
         per_device_eval_batch_size=eval_batch_size,
         num_train_epochs=num_train_epochs,
         learning_rate=learning_rate,
         weight_decay=weight_decay,
         warmup_ratio=warmup_ratio,
-        logging_steps=10,
+        logging_steps=11,
         logging_strategy="steps",
         save_total_limit=1,
         load_best_model_at_end=False,
