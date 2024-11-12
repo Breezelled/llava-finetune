@@ -1,46 +1,49 @@
 {
     "results": [
         {
+            "Prompt": "Given 5 examples:         'A white knight.'\n         'A black pawn and a black rook.'\n         'A white pawn, a black queen and a white knight. Portions of other chess pieces are also visible.'\n         'A white king, a white queen and a black king - all standing close together near a chess board.'\n         'A white bishop with the bottom of some black chess pieces in the background.'\n        Now, like the example, briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A white bishop with a white knight.",
-            "Model Output": "The image shows a wooden chess set with the following pieces visible:\n\n- A white king\n- A white queen\n- A white rook\n- A white bishop\n- A black pawn\n- A black knight\n\nThe pieces are arranged on a wooden surface, and the lighting suggests an indoor setting. The chess pieces are made of a light-colored wood, and the black pieces have a dark stain or paint to distinguish them from the white pieces.",
+            "Model Output": "The image shows a wooden chess set with the following pieces visible:\n\n- A white king.\n- A white queen.\n- A white knight.\n- A black pawn.\n- A black rook.\n\nThe pieces are arranged on a wooden surface, and the focus is on the king and the queen, which are standing close together. The other pieces are partially visible in the background.",
             "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.803926944732666,
-                "recall": 0.8783524036407471,
-                "f1": 0.8394933342933655
+                "precision": 0.8191264867782593,
+                "recall": 0.879416823387146,
+                "f1": 0.8482016324996948
             },
             "Correct Prediction": false
         },
         {
+            "Prompt": "Given 5 examples:         'A white knight.'\n         'A black pawn and a black rook.'\n         'A white pawn, a black queen and a white knight. Portions of other chess pieces are also visible.'\n         'A white king, a white queen and a black king - all standing close together near a chess board.'\n         'A white bishop with the bottom of some black chess pieces in the background.'\n        Now, like the example, briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A black rook, a black bishop and a white bishop all standing together.",
-            "Model Output": "The image shows a wooden chess set with the following pieces visible:\n\n- A white king\n- A white queen\n- A white knight\n- A black pawn\n- A black rook\n\nThe pieces are arranged on a light-colored wooden surface, and the lighting casts shadows on the table, indicating a light source from the upper left side of the image. The chess pieces are in a somewhat disorganized state, with some pieces overlapping or partially obscured by others.",
+            "Model Output": "The image shows a wooden chess set with the following pieces visible:\n\n- A white knight.\n- A black pawn and a black rook.\n- A white pawn, a black queen, and a white knight. The white knight is partially obscured by the black queen.\n- A white king, a white queen, and a black king. The white king and queen are partially obscured by the black king.\n- A white bishop with the bottom of some black chess pieces in the background.",
             "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.8060604929924011,
-                "recall": 0.8621227741241455,
-                "f1": 0.8331495523452759
+                "precision": 0.8302246928215027,
+                "recall": 0.8792674541473389,
+                "f1": 0.8540425300598145
             },
             "Correct Prediction": false
         },
         {
+            "Prompt": "Given 5 examples:         'A white knight.'\n         'A black pawn and a black rook.'\n         'A white pawn, a black queen and a white knight. Portions of other chess pieces are also visible.'\n         'A white king, a white queen and a black king - all standing close together near a chess board.'\n         'A white bishop with the bottom of some black chess pieces in the background.'\n        Now, like the example, briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A black knight and a white rook. There is also half of what appears to be a black pawn to the side.",
-            "Model Output": "The image shows a wooden chessboard with several pieces on it. There is a white knight, a black rook, a white pawn, a black queen, and a white king. The pieces are arranged in a way that suggests a game in progress, with the white king and black queen standing close together, and the white knight and black rook positioned diagonally from each other. The white bishop is also visible, but only the bottom part of it is shown in the image. The chessboard itself appears to be a standard wooden board with squares, and the pieces are the typical plastic or wooden pieces used in a game of chess.",
-            "BLEU Score": 0.04321609369804466,
+            "Model Output": "The image shows a wooden chessboard with several pieces on it. There is a white knight, a black pawn, a white pawn, a black queen, and a white bishop. The pieces are arranged in a way that suggests a game in progress, with the white knight and black pawn in the foreground, the white pawn and black queen in the middle, and the white bishop in the background.",
+            "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.8450509309768677,
-                "recall": 0.8953613042831421,
-                "f1": 0.8694789409637451
+                "precision": 0.8600972890853882,
+                "recall": 0.8829872608184814,
+                "f1": 0.871392011642456
             },
             "Correct Prediction": false
         }
     ],
     "summary": {
         "Accuracy": 0.0,
-        "Average BLEU Score": 0.014405364566014886,
+        "Average BLEU Score": 0.0,
         "Average BERTScore": {
-            "precision": 0.8183461229006449,
-            "recall": 0.8786121606826782,
-            "f1": 0.8473739425341288
+            "precision": 0.83648282289505,
+            "recall": 0.8805571794509888,
+            "f1": 0.8578787247339884
         }
     }
 }

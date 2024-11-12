@@ -1,46 +1,49 @@
 {
     "results": [
         {
+            "Prompt": "Given 5 examples:         'A white knight.'\n         'A black pawn and a black rook.'\n         'A white pawn, a black queen and a white knight. Portions of other chess pieces are also visible.'\n         'A white king, a white queen and a black king - all standing close together near a chess board.'\n         'A white bishop with the bottom of some black chess pieces in the background.'\n        Now, like the example, briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A white bishop with a white knight.",
-            "Model Output": "The image shows a chess set with the following pieces visible:\n\n- A white king, positioned in the center of the image, with the bottom of a black king and a white queen partially visible in the background.\n- A white queen, located to the right of the white king, with the bottom of a black king and a white bishop visible in the background.\n- A white bishop, situated to the right of the white queen, with the bottom of a black king and a white knight visible in the background.\n- A white knight, positioned to the right of the white bishop, with the bottom of a black king and a white pawn visible in the background.\n- A black pawn, located to the left of the white knight, with the bottom of a black king and a white pawn visible in the background.\n\nThe image is taken from a perspective that shows the underside of the pieces, and the focus is on the white pieces, with the black pieces appearing slightly blurred in the background. The chessboard itself is not visible in the image.",
+            "Model Output": "\"A white bishop and a black knight.\"",
             "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.776516854763031,
-                "recall": 0.869178295135498,
-                "f1": 0.8202388882637024
+                "precision": 0.9270714521408081,
+                "recall": 0.9374287128448486,
+                "f1": 0.9322212934494019
             },
             "Correct Prediction": false
         },
         {
+            "Prompt": "Given 5 examples:         'A white knight.'\n         'A black pawn and a black rook.'\n         'A white pawn, a black queen and a white knight. Portions of other chess pieces are also visible.'\n         'A white king, a white queen and a black king - all standing close together near a chess board.'\n         'A white bishop with the bottom of some black chess pieces in the background.'\n        Now, like the example, briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A black rook, a black bishop and a white bishop all standing together.",
-            "Model Output": "The image shows a chess set with the following pieces visible:\n\n- A white king, positioned in the center of the image.\n- A white queen, located to the right of the king.\n- A white bishop, situated to the left of the king.\n- A black pawn, positioned in the bottom left corner of the image.\n- A black rook, located in the bottom right corner of the image.\n\nThe pieces are placed on a flat surface, and the image is taken from a perspective that allows the viewer to see the underside of the pieces, as well as the shadows they cast on the surface. The focus is on the chess pieces, and the background is not clearly distinguishable.",
-            "BLEU Score": 0.02260456518269218,
+            "Model Output": "\"A white bishop and a black knight are visible in the image, with the bottom of some black chess pieces in the background.\"",
+            "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.8068422079086304,
-                "recall": 0.8724303841590881,
-                "f1": 0.8383553624153137
+                "precision": 0.871263861656189,
+                "recall": 0.898471474647522,
+                "f1": 0.8846585154533386
             },
             "Correct Prediction": false
         },
         {
+            "Prompt": "Given 5 examples:         'A white knight.'\n         'A black pawn and a black rook.'\n         'A white pawn, a black queen and a white knight. Portions of other chess pieces are also visible.'\n         'A white king, a white queen and a black king - all standing close together near a chess board.'\n         'A white bishop with the bottom of some black chess pieces in the background.'\n        Now, like the example, briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A black knight and a white rook. There is also half of what appears to be a black pawn to the side.",
-            "Model Output": "The image shows a white bishop and a black rook on a chessboard. The bishop is positioned on the f5 square, and the rook is on the a5 square. The rest of the chessboard is not fully visible, but it appears to be a standard chess setup with the pieces in their starting positions. The focus is on the bishop and the rook, which are the only pieces that can be clearly identified.",
-            "BLEU Score": 0.04586714611714401,
+            "Model Output": "\"A white bishop and a black knight are visible, with the bottom of a white king and a black rook partially shown in the background.\"",
+            "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.8485551476478577,
-                "recall": 0.8929281830787659,
-                "f1": 0.870176374912262
+                "precision": 0.9064146280288696,
+                "recall": 0.9090850353240967,
+                "f1": 0.9077478647232056
             },
             "Correct Prediction": false
         }
     ],
     "summary": {
         "Accuracy": 0.0,
-        "Average BLEU Score": 0.02282390376661206,
+        "Average BLEU Score": 0.0,
         "Average BERTScore": {
-            "precision": 0.8106380701065063,
-            "recall": 0.8781789541244507,
-            "f1": 0.8429235418637594
+            "precision": 0.9015833139419556,
+            "recall": 0.9149950742721558,
+            "f1": 0.908209224541982
         }
     }
 }

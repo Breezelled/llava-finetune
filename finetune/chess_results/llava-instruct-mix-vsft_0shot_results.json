@@ -1,46 +1,49 @@
 {
     "results": [
         {
+            "Prompt": "Briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A white bishop with a white knight.",
-            "Model Output": "In the image, there are two chess pieces on a wooden table: a white rook and a black king.",
+            "Model Output": "The image features two chess pieces: a white rook and a black king. Both pieces are made of wood and placed on a wooden surface.",
             "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.86029052734375,
-                "recall": 0.8873035907745361,
-                "f1": 0.8735882639884949
+                "precision": 0.8546578884124756,
+                "recall": 0.8837354183197021,
+                "f1": 0.8689534664154053
             },
             "Correct Prediction": false
         },
         {
+            "Prompt": "Briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A black rook, a black bishop and a white bishop all standing together.",
-            "Model Output": "The chess pieces in the image include a king, a queen, a rook, a bishop, a knight, and a pawn. The king and queen are white, while the rook, bishop, knight, and pawn are black.",
-            "BLEU Score": 0.0,
+            "Model Output": "The chess pieces in the image include a white king, a black queen, a white rook, a black bishop, and a white pawn. These pieces are arranged on a wooden chessboard.",
+            "BLEU Score": 0.13191601177632875,
             "BERT Score": {
-                "precision": 0.8511242866516113,
-                "recall": 0.8777104616165161,
-                "f1": 0.8642129302024841
+                "precision": 0.8681563138961792,
+                "recall": 0.89483642578125,
+                "f1": 0.8812944889068604
             },
             "Correct Prediction": false
         },
         {
+            "Prompt": "Briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A black knight and a white rook. There is also half of what appears to be a black pawn to the side.",
-            "Model Output": "In the image, there are two chess pieces: a rook and a king. The rook is black, and the king is white.",
+            "Model Output": "In the image, there are two chess pieces on a wooden table: a white rook and a black rook.",
             "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.8834426999092102,
-                "recall": 0.8796931505203247,
-                "f1": 0.8815639019012451
+                "precision": 0.8829156160354614,
+                "recall": 0.8870189785957336,
+                "f1": 0.8849624991416931
             },
             "Correct Prediction": false
         }
     ],
     "summary": {
         "Accuracy": 0.0,
-        "Average BLEU Score": 0.0,
+        "Average BLEU Score": 0.04397200392544292,
         "Average BERTScore": {
-            "precision": 0.8649525046348572,
-            "recall": 0.8815690676371256,
-            "f1": 0.8731216986974081
+            "precision": 0.8685766061147054,
+            "recall": 0.8885302742322286,
+            "f1": 0.8784034848213196
         }
     }
 }

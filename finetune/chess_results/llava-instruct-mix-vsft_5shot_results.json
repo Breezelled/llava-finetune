@@ -1,35 +1,38 @@
 {
     "results": [
         {
+            "Prompt": "Given 5 examples:         'A white knight.'\n         'A black pawn and a black rook.'\n         'A white pawn, a black queen and a white knight. Portions of other chess pieces are also visible.'\n         'A white king, a white queen and a black king - all standing close together near a chess board.'\n         'A white bishop with the bottom of some black chess pieces in the background.'\n        Now, like the example, briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A white bishop with a white knight.",
-            "Model Output": "In the image, there are two chess pieces on a wooden surface. The first piece is a white knight, which is placed on top of a white pawn. The second piece is a black rook, which is positioned next to the white knight. The chess pieces are arranged in a way that they are close to each other, and the background features the rest of the chess set.",
+            "Model Output": "The image shows a wooden chess set on a wooden surface. There is a white knight, a black pawn, a white pawn, a black queen, and a white bishop. The white knight is standing on top of the white pawn, and the white bishop is standing on top of the black pawn. The black queen is also visible in the background.",
             "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.8204212784767151,
-                "recall": 0.875924825668335,
-                "f1": 0.8472650647163391
+                "precision": 0.8217190504074097,
+                "recall": 0.8767622709274292,
+                "f1": 0.8483487367630005
             },
             "Correct Prediction": false
         },
         {
+            "Prompt": "Given 5 examples:         'A white knight.'\n         'A black pawn and a black rook.'\n         'A white pawn, a black queen and a white knight. Portions of other chess pieces are also visible.'\n         'A white king, a white queen and a black king - all standing close together near a chess board.'\n         'A white bishop with the bottom of some black chess pieces in the background.'\n        Now, like the example, briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A black rook, a black bishop and a white bishop all standing together.",
-            "Model Output": "The chess pieces in the image include a white knight, a black pawn, and a white pawn. The white knight is standing on top of the black pawn, and the white pawn is positioned next to the black pawn. The image also shows the shadow of the chess pieces on the wooden surface.",
+            "Model Output": "The image shows a white king, a white queen, a white knight, a white bishop, and a black pawn on a wooden chessboard.",
             "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.856137752532959,
-                "recall": 0.8836196660995483,
-                "f1": 0.8696616888046265
+                "precision": 0.8783684968948364,
+                "recall": 0.8917471170425415,
+                "f1": 0.8850072622299194
             },
             "Correct Prediction": false
         },
         {
+            "Prompt": "Given 5 examples:         'A white knight.'\n         'A black pawn and a black rook.'\n         'A white pawn, a black queen and a white knight. Portions of other chess pieces are also visible.'\n         'A white king, a white queen and a black king - all standing close together near a chess board.'\n         'A white bishop with the bottom of some black chess pieces in the background.'\n        Now, like the example, briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A black knight and a white rook. There is also half of what appears to be a black pawn to the side.",
-            "Model Output": "In the image, there are two chess pieces on a wooden surface. The first piece is a white knight, which is a type of chess piece that moves in an L-shaped pattern. The second piece is a white rook, which is a type of chess piece that moves horizontally or vertically. Both pieces are white, indicating that they belong to the same player in a game of chess.",
+            "Model Output": "The image shows a wooden chessboard with several pieces on it. There is a white knight, a black pawn, a white pawn, a black queen, and a white bishop. The pieces are arranged on the board, and the background is blurred, making it difficult to discern the rest of the chessboard.",
             "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.8368183970451355,
-                "recall": 0.8690344095230103,
-                "f1": 0.8526222109794617
+                "precision": 0.8679682016372681,
+                "recall": 0.8843690156936646,
+                "f1": 0.8760918378829956
             },
             "Correct Prediction": false
         }
@@ -38,9 +41,9 @@
         "Accuracy": 0.0,
         "Average BLEU Score": 0.0,
         "Average BERTScore": {
-            "precision": 0.8377924760182699,
-            "recall": 0.8761929670969645,
-            "f1": 0.8565163215001425
+            "precision": 0.856018582979838,
+            "recall": 0.8842928012212118,
+            "f1": 0.8698159456253052
         }
     }
 }

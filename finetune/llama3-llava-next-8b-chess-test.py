@@ -16,16 +16,16 @@ def main(model_id, is_few_shot=False):
     eval_batch_size = 1
     max_length = 4096
     max_new_tokens = 256
-    prompt = "Describe the chess pieces in the image, including their types and colors."
+    prompt = "Briefly describe the chess pieces in the image, including their types and colors."
 
     if is_few_shot:
         prompt = "Given 5 examples: \
-        Question: Describe the chess pieces in the image, including their types and colors. Answer: 'A white knight.', \
-        Question: Describe the chess pieces in the image, including their types and colors. Answer: 'A black pawn and a black rook.', \
-        Question: Describe the chess pieces in the image, including their types and colors. Answer: 'A white pawn, a black queen and a white knight. Portions of other chess pieces are also visible.', \
-        Question: Describe the chess pieces in the image, including their types and colors. Answer: 'A white king, a white queen and a black king - all standing close together near a chess board.', \
-        Question: Describe the chess pieces in the image, including their types and colors. Answer: 'A white bishop with the bottom of some black chess pieces in the background.' \
-        Now, describe the chess pieces in the image, including their types and colors."
+        'A white knight.'\n \
+        'A black pawn and a black rook.'\n \
+        'A white pawn, a black queen and a white knight. Portions of other chess pieces are also visible.'\n \
+        'A white king, a white queen and a black king - all standing close together near a chess board.'\n \
+        'A white bishop with the bottom of some black chess pieces in the background.'\n\
+        Now, like the example, briefly describe the chess pieces in the image, including their types and colors."
 
     processor = LlavaNextProcessor.from_pretrained(pretrained_id)
     model = LlavaNextForConditionalGeneration.from_pretrained(
@@ -124,6 +124,7 @@ def main(model_id, is_few_shot=False):
                 bertscore_scores["f1"].extend(bertscore_result["f1"])
 
                 results.append({
+                    "Prompt": prompt_text,
                     "Ground Truth": expected_output,
                     "Model Output": model_output,
                     "BLEU Score": bleu_result["bleu"],

@@ -1,46 +1,49 @@
 {
     "results": [
         {
+            "Prompt": "Briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A white bishop with a white knight.",
-            "Model Output": "The image shows two chess pieces on a flat surface. On the left, there is a **White Queen**, and on the right, there is a **Black Rook**. The pieces are positioned diagonally from each other, with the Queen at the top and the Rook at the bottom. The Queen is facing the camera, while the Rook is facing away. The pieces appear to be made of a light-colored material, possibly plastic or ivory, and they have a glossy finish. The background is a simple, unadorned, and it's a bit blurry, but it looks like a flat, light-colored surface, perhaps a table or a desk. The focus is clearly on the chess pieces themselves.",
+            "Model Output": "The image shows a chess set with the following pieces:\n\n- A white king, which is the central piece in the center of the image.\n- A white queen, which is the second piece from the king, located to the right of the king.\n- A white rook, which is the third piece from the king, located to the right of the queen.\n- A white bishop, which is the fourth piece from the king, located to the right of the rook.\n- A white knight, which is the fifth piece from the king, located to the right of the bishop.\n- A white pawn, which is the sixth piece from the king, located to the right of the knight.\n\nThe pieces are made of a light-colored material, possibly plastic or a similar synthetic material, and they appear to be a simple, possibly educational or novelty set, given their simplistic design and the absence of intricate details or engravings. The pieces are placed on a flat, light-colored surface, which could be a table or a similar flat, horizontal object.",
             "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.7961255311965942,
-                "recall": 0.8593771457672119,
-                "f1": 0.8265430331230164
+                "precision": 0.7699970006942749,
+                "recall": 0.8666674494743347,
+                "f1": 0.8154773116111755
             },
             "Correct Prediction": false
         },
         {
+            "Prompt": "Briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A black rook, a black bishop and a white bishop all standing together.",
-            "Model Output": "The image shows a set of chess pieces laid out on a flat surface. From left to right, the pieces are a **black Rook**, a **black Knight**, a **white Rook**, a **white Knight**, and a **white Bishop**. The pieces are in a somewhat disorganized arrangement, with the Rooks at the ends and the Knights and Bishop in the middle. The pieces appear to be of a standard design, with the Rooks being the tallest and the Bishop being the shortest.",
+            "Model Output": "The image shows a set of chess pieces laid out on a flat surface. From left to right, there is a **black Rook**, a **black Knight**, a **white Rook**, a **white Knight**, and a **white Bishop**. The pieces are in a somewhat disorganized arrangement, with the Rooks at the ends and the Knights and Bishop in the middle. The pieces appear to be of a standard design, with the Rooks being the tallest and the Bishop being the shortest.",
             "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.815871000289917,
-                "recall": 0.8783766031265259,
-                "f1": 0.8459708094596863
+                "precision": 0.81571364402771,
+                "recall": 0.8788610696792603,
+                "f1": 0.8461108207702637
             },
             "Correct Prediction": false
         },
         {
+            "Prompt": "Briefly describe the chess pieces in the image, including their types and colors.",
             "Ground Truth": "A black knight and a white rook. There is also half of what appears to be a black pawn to the side.",
-            "Model Output": "The image shows a chess set with the following pieces visible:\n\n- A **White King**: The king is the most prominent piece in the image, standing upright on the right side of the board. It is a standard chess king with a flat top and a slightly tapered bottom, and it appears to be a plastic or resin piece, which is common for casual play.\n\n- A **Black Rook**: The rook is positioned on the left side of the board, facing the camera. It is also a standard chess rook with a flat top and a slightly tapered bottom, and it appears to be a plastic or resin piece, which is common for casual play.\n\nThe rest of the chess set is not visible in the image, so the exact types and colors of the other pieces are not known. The chessboard itself is not fully visible, but it appears to be a standard, flat, and smooth playing surface, likely made of a light-colored material like plastic or cardboard. The image is taken from a perspective that focuses on the two pieces, with the rest of the set and the board being out of the frame.",
-            "BLEU Score": 0.015842329288113854,
+            "Model Output": "The image shows a chess set with the following pieces:\n\n- A white king, which is the central piece in the image.\n- A black rook, which is the piece to the left of the king.\n- A white bishop, which is the piece to the right of the king.\n- A black knight, which is the piece to the right of the rook.\n- A white pawn, which is the piece to the left of the rook.\n\nThe pieces are placed on a flat, light-colored surface, and the lighting suggests an indoor setting. The pieces appear to be of a standard chess set, with the king being the most prominent due to its central position.",
+            "BLEU Score": 0.0,
             "BERT Score": {
-                "precision": 0.8012259006500244,
-                "recall": 0.8634058833122253,
-                "f1": 0.8311545252799988
+                "precision": 0.8213392496109009,
+                "recall": 0.8742616772651672,
+                "f1": 0.8469745516777039
             },
             "Correct Prediction": false
         }
     ],
     "summary": {
         "Accuracy": 0.0,
-        "Average BLEU Score": 0.005280776429371285,
+        "Average BLEU Score": 0.0,
         "Average BERTScore": {
-            "precision": 0.8044074773788452,
-            "recall": 0.867053210735321,
-            "f1": 0.8345561226209005
+            "precision": 0.8023499647776285,
+            "recall": 0.873263398806254,
+            "f1": 0.8361875613530477
         }
     }
 }
