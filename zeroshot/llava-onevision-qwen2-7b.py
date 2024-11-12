@@ -10,6 +10,7 @@ from llava.mm_utils import process_images, tokenizer_image_token
 from llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN
 from llava.conversation import conv_templates
 import copy
+from PIL import Image
 
 max_length = 4096
 max_new_tokens = 256
@@ -54,7 +55,7 @@ for batch in tqdm(dataloader, desc="Processing batches"):
 
     # Process each example in the batch
     for i, example in enumerate(batch):
-        image = example["images"][0]
+        image = example["images"][0].convert("RGB")
         nb_messages = len(example["messages"]) // 2
 
         for j in range(int(nb_messages)):

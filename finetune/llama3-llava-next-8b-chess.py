@@ -20,11 +20,10 @@ def main():
 
     model_id = "llava-hf/llama3-llava-next-8b-hf"
     dataset_id = "Trelis/chess_pieces"
-    output_dir = f"../model/{model_id.split('/')[1]}/{dataset_id.split('/')[1]}"
+    output_dir = f"../model/{model_id.split('/')[1]}/{dataset_id.split('/')[1]}-1epoch-better-prompt"
     train_batch_size = 1
-    eval_batch_size = 1
     gradient_accumulation_steps = 1
-    num_train_epochs = 3
+    num_train_epochs = 1
     learning_rate = 2e-5
     weight_decay = 0.0
     warmup_ratio = 0.03
@@ -99,7 +98,7 @@ def main():
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "Caption this image."},
+                        {"type": "text", "text": "Describe the chess pieces in the image, including their types and colors."},
                         {"type": "image"},
                     ],
                 },
@@ -136,12 +135,11 @@ def main():
         save_strategy="steps",
         # save_steps=30000,
         per_device_train_batch_size=train_batch_size,
-        per_device_eval_batch_size=eval_batch_size,
         num_train_epochs=num_train_epochs,
         learning_rate=learning_rate,
         weight_decay=weight_decay,
         warmup_ratio=warmup_ratio,
-        logging_steps=11,
+        logging_steps=1,
         logging_strategy="steps",
         save_total_limit=1,
         load_best_model_at_end=False,

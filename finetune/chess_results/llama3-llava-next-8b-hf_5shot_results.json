@@ -1,0 +1,46 @@
+{
+    "results": [
+        {
+            "Ground Truth": "A white bishop with a white knight.",
+            "Model Output": "The image shows a wooden chess set with the following pieces visible:\n\n- A white king\n- A white queen\n- A white rook\n- A white bishop\n- A black pawn\n- A black knight\n\nThe pieces are arranged on a wooden surface, and the lighting suggests an indoor setting. The chess pieces are made of a light-colored wood, and the black pieces have a dark stain or paint to distinguish them from the white pieces.",
+            "BLEU Score": 0.0,
+            "BERT Score": {
+                "precision": 0.803926944732666,
+                "recall": 0.8783524036407471,
+                "f1": 0.8394933342933655
+            },
+            "Correct Prediction": false
+        },
+        {
+            "Ground Truth": "A black rook, a black bishop and a white bishop all standing together.",
+            "Model Output": "The image shows a wooden chess set with the following pieces visible:\n\n- A white king\n- A white queen\n- A white knight\n- A black pawn\n- A black rook\n\nThe pieces are arranged on a light-colored wooden surface, and the lighting casts shadows on the table, indicating a light source from the upper left side of the image. The chess pieces are in a somewhat disorganized state, with some pieces overlapping or partially obscured by others.",
+            "BLEU Score": 0.0,
+            "BERT Score": {
+                "precision": 0.8060604929924011,
+                "recall": 0.8621227741241455,
+                "f1": 0.8331495523452759
+            },
+            "Correct Prediction": false
+        },
+        {
+            "Ground Truth": "A black knight and a white rook. There is also half of what appears to be a black pawn to the side.",
+            "Model Output": "The image shows a wooden chessboard with several pieces on it. There is a white knight, a black rook, a white pawn, a black queen, and a white king. The pieces are arranged in a way that suggests a game in progress, with the white king and black queen standing close together, and the white knight and black rook positioned diagonally from each other. The white bishop is also visible, but only the bottom part of it is shown in the image. The chessboard itself appears to be a standard wooden board with squares, and the pieces are the typical plastic or wooden pieces used in a game of chess.",
+            "BLEU Score": 0.04321609369804466,
+            "BERT Score": {
+                "precision": 0.8450509309768677,
+                "recall": 0.8953613042831421,
+                "f1": 0.8694789409637451
+            },
+            "Correct Prediction": false
+        }
+    ],
+    "summary": {
+        "Accuracy": 0.0,
+        "Average BLEU Score": 0.014405364566014886,
+        "Average BERTScore": {
+            "precision": 0.8183461229006449,
+            "recall": 0.8786121606826782,
+            "f1": 0.8473739425341288
+        }
+    }
+}

@@ -1,0 +1,46 @@
+{
+    "results": [
+        {
+            "Ground Truth": "A white bishop with a white knight.",
+            "Model Output": "The image shows two chess pieces on a wooden surface. The piece on the left is a white rook, and the piece on the right is a black rook. Both pieces are made of a light-colored material, possibly plastic or wood, and have a smooth finish. The rook on the left has a traditional design with a pointed top and a flat base, while the rook on the right appears to be a simplified or abstract design with a rounded top and a flat base.",
+            "BLEU Score": 0.0,
+            "BERT Score": {
+                "precision": 0.809755265712738,
+                "recall": 0.8696737289428711,
+                "f1": 0.8386455774307251
+            },
+            "Correct Prediction": false
+        },
+        {
+            "Ground Truth": "A black rook, a black bishop and a white bishop all standing together.",
+            "Model Output": "The image shows a set of chess pieces on a wooden surface. From left to right, there is a black rook, a black knight, a white queen, a white bishop, a white rook, and a white king. The pieces are arranged in a line, with the rooks on the ends and the king in the center. The pieces appear to be made of a dark wood with lighter wood for the white pieces, and they have a smooth finish.",
+            "BLEU Score": 0.05747584499385493,
+            "BERT Score": {
+                "precision": 0.8320942521095276,
+                "recall": 0.8877546787261963,
+                "f1": 0.8590238094329834
+            },
+            "Correct Prediction": false
+        },
+        {
+            "Ground Truth": "A black knight and a white rook. There is also half of what appears to be a black pawn to the side.",
+            "Model Output": "The image shows a chessboard with two pieces on it. On the left, there is a black rook, and on the right, there is a white queen. The chessboard itself is not fully visible, but it appears to be a standard wooden chessboard with light-colored squares.",
+            "BLEU Score": 0.06558144622598075,
+            "BERT Score": {
+                "precision": 0.8589167594909668,
+                "recall": 0.8951982259750366,
+                "f1": 0.8766822814941406
+            },
+            "Correct Prediction": false
+        }
+    ],
+    "summary": {
+        "Accuracy": 0.0,
+        "Average BLEU Score": 0.04101909707327856,
+        "Average BERTScore": {
+            "precision": 0.8335887591044108,
+            "recall": 0.884208877881368,
+            "f1": 0.8581172227859497
+        }
+    }
+}

@@ -1,0 +1,46 @@
+{
+    "results": [
+        {
+            "Ground Truth": "A white bishop with a white knight.",
+            "Model Output": "In the image, there are two chess pieces on a wooden table: a white rook and a black king.",
+            "BLEU Score": 0.0,
+            "BERT Score": {
+                "precision": 0.86029052734375,
+                "recall": 0.8873035907745361,
+                "f1": 0.8735882639884949
+            },
+            "Correct Prediction": false
+        },
+        {
+            "Ground Truth": "A black rook, a black bishop and a white bishop all standing together.",
+            "Model Output": "The chess pieces in the image include a king, a queen, a rook, a bishop, a knight, and a pawn. The king and queen are white, while the rook, bishop, knight, and pawn are black.",
+            "BLEU Score": 0.0,
+            "BERT Score": {
+                "precision": 0.8511242866516113,
+                "recall": 0.8777104616165161,
+                "f1": 0.8642129302024841
+            },
+            "Correct Prediction": false
+        },
+        {
+            "Ground Truth": "A black knight and a white rook. There is also half of what appears to be a black pawn to the side.",
+            "Model Output": "In the image, there are two chess pieces: a rook and a king. The rook is black, and the king is white.",
+            "BLEU Score": 0.0,
+            "BERT Score": {
+                "precision": 0.8834426999092102,
+                "recall": 0.8796931505203247,
+                "f1": 0.8815639019012451
+            },
+            "Correct Prediction": false
+        }
+    ],
+    "summary": {
+        "Accuracy": 0.0,
+        "Average BLEU Score": 0.0,
+        "Average BERTScore": {
+            "precision": 0.8649525046348572,
+            "recall": 0.8815690676371256,
+            "f1": 0.8731216986974081
+        }
+    }
+}

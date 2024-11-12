@@ -1,0 +1,46 @@
+{
+    "results": [
+        {
+            "Ground Truth": "A white bishop with a white knight.",
+            "Model Output": "The image shows two chess pieces on a flat surface. On the left, there is a **White Queen**, and on the right, there is a **Black Rook**. The pieces are positioned diagonally from each other, with the Queen at the top and the Rook at the bottom. The Queen is facing the camera, while the Rook is facing away. The pieces appear to be made of a light-colored material, possibly plastic or ivory, and they have a glossy finish. The background is a simple, unadorned, and it's a bit blurry, but it looks like a flat, light-colored surface, perhaps a table or a desk. The focus is clearly on the chess pieces themselves.",
+            "BLEU Score": 0.0,
+            "BERT Score": {
+                "precision": 0.7961255311965942,
+                "recall": 0.8593771457672119,
+                "f1": 0.8265430331230164
+            },
+            "Correct Prediction": false
+        },
+        {
+            "Ground Truth": "A black rook, a black bishop and a white bishop all standing together.",
+            "Model Output": "The image shows a set of chess pieces laid out on a flat surface. From left to right, the pieces are a **black Rook**, a **black Knight**, a **white Rook**, a **white Knight**, and a **white Bishop**. The pieces are in a somewhat disorganized arrangement, with the Rooks at the ends and the Knights and Bishop in the middle. The pieces appear to be of a standard design, with the Rooks being the tallest and the Bishop being the shortest.",
+            "BLEU Score": 0.0,
+            "BERT Score": {
+                "precision": 0.815871000289917,
+                "recall": 0.8783766031265259,
+                "f1": 0.8459708094596863
+            },
+            "Correct Prediction": false
+        },
+        {
+            "Ground Truth": "A black knight and a white rook. There is also half of what appears to be a black pawn to the side.",
+            "Model Output": "The image shows a chess set with the following pieces visible:\n\n- A **White King**: The king is the most prominent piece in the image, standing upright on the right side of the board. It is a standard chess king with a flat top and a slightly tapered bottom, and it appears to be a plastic or resin piece, which is common for casual play.\n\n- A **Black Rook**: The rook is positioned on the left side of the board, facing the camera. It is also a standard chess rook with a flat top and a slightly tapered bottom, and it appears to be a plastic or resin piece, which is common for casual play.\n\nThe rest of the chess set is not visible in the image, so the exact types and colors of the other pieces are not known. The chessboard itself is not fully visible, but it appears to be a standard, flat, and smooth playing surface, likely made of a light-colored material like plastic or cardboard. The image is taken from a perspective that focuses on the two pieces, with the rest of the set and the board being out of the frame.",
+            "BLEU Score": 0.015842329288113854,
+            "BERT Score": {
+                "precision": 0.8012259006500244,
+                "recall": 0.8634058833122253,
+                "f1": 0.8311545252799988
+            },
+            "Correct Prediction": false
+        }
+    ],
+    "summary": {
+        "Accuracy": 0.0,
+        "Average BLEU Score": 0.005280776429371285,
+        "Average BERTScore": {
+            "precision": 0.8044074773788452,
+            "recall": 0.867053210735321,
+            "f1": 0.8345561226209005
+        }
+    }
+}
