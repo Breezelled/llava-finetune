@@ -21,8 +21,8 @@ def main():
     model_id = "llava-hf/llama3-llava-next-8b-hf"
     dataset_id = "HuggingFaceH4/llava-instruct-mix-vsft"
     output_dir = f"../model/{model_id.split('/')[1]}/{dataset_id.split('/')[1]}"
-    train_batch_size = 2
-    eval_batch_size = 1
+    train_batch_size = 4
+    eval_batch_size = 4
     gradient_accumulation_steps = 1
     num_train_epochs = 1
     learning_rate = 2e-5
@@ -89,7 +89,6 @@ def main():
     model = get_peft_model(model, lora_config)
 
     train_dataset = load_dataset(dataset_id, split="train")
-    val_dataset = load_dataset(dataset_id, split="test")
 
     def train_collate_fn(examples):
         texts = [
@@ -158,9 +157,6 @@ def main():
 
     trainer.train()
     trainer.save_model(output_dir)
-
-    # test_results = trainer.predict(val_dataset)
-    # print(test_results)
 
 
 if __name__ == "__main__":

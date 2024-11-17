@@ -2,11 +2,7 @@ import numpy as np
 from data_inspection import dataset
 from transformers import LlavaNextProcessor, LlavaNextForConditionalGeneration, BitsAndBytesConfig
 import torch
-from PIL import Image
-import matplotlib.pyplot as plt
-import os
 import json
-import gc
 from tqdm import tqdm
 from datasets import load_dataset
 import evaluate

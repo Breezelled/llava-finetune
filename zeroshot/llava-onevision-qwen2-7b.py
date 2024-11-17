@@ -2,7 +2,6 @@ import torch
 from datasets import load_dataset
 import numpy as np
 from tqdm import tqdm
-import os
 from torch.utils.data import DataLoader
 import evaluate
 from llava.model.builder import load_pretrained_model
@@ -10,7 +9,6 @@ from llava.mm_utils import process_images, tokenizer_image_token
 from llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN
 from llava.conversation import conv_templates
 import copy
-from PIL import Image
 
 max_length = 4096
 max_new_tokens = 256
