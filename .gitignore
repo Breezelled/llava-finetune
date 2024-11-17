@@ -2,11 +2,8 @@
 /.vscode
 /baseline/__pycache__
 
-script
-
 /Breeze
 
-/benchmark/src
-/benchmark/VLMEvalKit
-
 /model
+
+*.sh
