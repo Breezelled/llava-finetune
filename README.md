@@ -1,18 +1,43 @@
-# COMP9444 Group Assignment
+# LLaVA Finetune
 
-## Group Member
-- Breeze Chen
-- Yolanda Song
-- Skyler Gu
-- Joffrey Ji
-- Yixin Kang
+Fine-tuning LLaVA Vision and Language Models to enhance domain-specific performance and general multimodal understanding.
 
-## Project 15: Fine-tune Multi-modal LLaVA Vision and Language Models
+## Core Features
 
+- 🧠 Fine-Tuning with LoRA
+  - Reduces computational cost while maintaining high performance using **PEFT**.
+- 📊 Multimodal Benchmarks
+  - Evaluated on benchmarks like MME, MMBench, MMMU, POPE and AI2D.
+- 📂 Dataset
+  - Supports multi-turn conversational datasets and domain-specific data for fine-tuning.
+- ⚖️ Comparative Analysis
+  - Benchmarked against pretrained models like LLaVA-1.5, LLaVA-Next, and LLaVA-OneVision to highlight trade-offs between specialization and generalization.
 
-## Timeline:
-base model tested
+## Techniques & Framework
 
+- Multi-turn Visual Instruction Tuning
+- Multi-turn Conversation Inference
+- LoRA
+- QLoRA
+- SDPA
+- Fused AdamW
+- Liger Kernel
+- VLMEvalKit
+- DDP
 
-Expanding inputs for image tokens in LLaVa-NeXT should be done in processing. Please add `patch_size` and `vision_feature_select_strategy` to the model's processing config or set directly with `processor.patch_size = {{patch_size}}` and processor.vision_feature_select_strategy = 
-{{vision_feature_select_strategy}}`. Using processors without these attributes in the config is deprecated and will throw an error in v4.47.Setting `pad_token_id` to `eos_token_id`:None for open-end generation.
+## Model
+
+- LLaVA v1.5 7B
+- LLaVA NEXT (LLaMA 3) 8B
+- LLaVA OneVision 7B
+
+## Multi-turn Conversation Architecture
+
+```mermaid
+flowchart TD
+    A[User Prompt + Image] -->|Step 1: Place into Context Window| B[Context Window<br> System Prompt]
+    B -->|Step 2: Feed into Model| C[Model Output]
+    C -->|Step 3: Compare with Ground Truth| D[Compute Metrics]
+    C -->|Step 4: Add Output back into Context Window| B
+    B -->|Repeat with New User Prompt| A
+```
